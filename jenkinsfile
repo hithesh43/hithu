@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+    environment {
+        PATH = "/opt/apache-maven-3.9.0/bin:$PATH"
+    }
+    stages {
+        stage("git clode"){
+            steps{
+                git 'https://github.com/challu123/maven-web-application.git'
+            }
+        }
+        stage("build code"){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        stage('tomcat'){
+            steps{
+         sshagent(['25df0e82-5c93-499f-b571-7da6072e2e7b']) {
+          sh "scp -o StrictHostKeyChecking=no /opt/var/lib/jenkins/workspace/jobname/target/weapp.war ec2-user@13.233.16.242:/opt/apache-tomcat-9.0.73/webapps"
+            }
+       
+        }
+       }
+      }
